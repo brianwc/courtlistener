@@ -1,9 +1,10 @@
 import html
 import re
 
+from django.conf import settings
 from django.urls import reverse
 from eyecite import annotate_citations
-from eyecite.models import IdCitation, SupraCitation
+from eyecite.models import FullLawCitation, IdCitation, SupraCitation
 
 from cl.citations.match_citations import (
     MULTIPLE_MATCHES_RESOURCE,
@@ -29,12 +30,23 @@ def generate_annotations(
     annotations: list[list] = []
     for opinion, citations in citation_resolutions.items():
         if opinion is NO_MATCH_RESOURCE:  # If unsuccessfully matched...
-            annotation = [
-                '<span class="citation no-link">',
-                "</span>",
-            ]
-            # Annotate all unmatched citations
-            annotations.extend([[c.span()] + annotation for c in citations])
+            for c in citations:
+                if isinstance(c, FullLawCitation) and c.corrected_reporter() == "U.S.C.":
+                    title = c.groups.get("title")
+                    section = c.groups.get("section")
+                    uscode_api_base = getattr(settings, "USCODE_API_URL", "https://api.courtlistener.com/uscode")
+                    link_url = f"{uscode_api_base}/link/uscode/{title}/{section}?link-type=html"
+                    annotation = [
+                        f'<span class="citation us-code-citation" data-title="{title}" data-section="{section}">'
+                        f'<a href="{html.escape(link_url)}" target="_blank" rel="noopener">',
+                        "</a></span>",
+                    ]
+                else:
+                    annotation = [
+                        '<span class="citation no-link">',
+                        "</span>",
+                    ]
+                annotations.append([c.span()] + annotation)
         elif opinion is MULTIPLE_MATCHES_RESOURCE:
             # Multiple matches, can't disambiguate
             for c in citations:

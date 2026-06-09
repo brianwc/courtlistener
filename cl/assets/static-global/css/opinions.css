@@ -82,8 +82,8 @@
 }
 
   li.jump-links.active {
-      color: #B53C2C;
-      font-weight: bold;
+    color: #B53C2C;
+    font-weight: bold;
   }
 
   li.jump-links {
@@ -694,4 +694,105 @@ html {
 
 #all-summaries {
     margin-top: 20px;
+}
+
+/* U.S. Code Slide-out Overlay Panel */
+.uscode-overlay-panel {
+    position: fixed;
+    top: 0;
+    right: -450px; /* Initially hidden off-screen */
+    width: 450px;
+    height: 100vh;
+    background-color: #ffffff;
+    box-shadow: -3px 0 15px rgba(0, 0, 0, 0.15);
+    z-index: 2000;
+    transition: right 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #e0e0e0;
+}
+
+.uscode-overlay-panel.open {
+    right: 0; /* Slide into view */
+}
+
+.uscode-overlay-header {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eeeeee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.uscode-overlay-header h4 {
+    margin: 0;
+    font-weight: 600;
+    color: #2b3e50;
+    font-size: 1.15em;
+}
+
+#uscode-overlay-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: #999;
+}
+
+#uscode-overlay-close:hover {
+    color: #d9534f;
+}
+
+.uscode-overlay-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex-grow: 1;
+    font-family: Georgia, serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333333;
+}
+
+.uscode-spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 0;
+    color: #666;
+}
+
+/* Custom USLM formatting in overlay */
+.uscode-statute-content {
+    display: none;
+}
+
+/* Indentation styling matching OLRC USLM design */
+.uscode-statute-content subsection,
+.uscode-rich-card subsection {
+    display: block;
+    margin-left: 20px;
+    margin-top: 8px;
+}
+
+.uscode-statute-content paragraph,
+.uscode-rich-card paragraph {
+    display: block;
+    margin-left: 40px;
+    margin-top: 6px;
+}
+
+.uscode-statute-content clause,
+.uscode-rich-card clause {
+    display: block;
+    margin-left: 60px;
+    margin-top: 4px;
+}
+
+.uscode-statute-content num,
+.uscode-rich-card num {
+    font-weight: bold;
+    margin-right: 5px;
 }

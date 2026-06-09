@@ -1,5 +1,9 @@
 from datetime import date
 from urllib.parse import quote
+import requests
+import eyecite
+from django.conf import settings
+from eyecite.models import FullLawCitation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -286,6 +290,32 @@ def show_results(request: HttpRequest) -> HttpResponse:
     alert_form.fields["name"].widget.attrs["value"] = trunc(
         render_dict["search_summary_str"], 75, ellipsis="..."
     )
+    # Check if the search query contains a U.S. Code reference to display a Rich Card
+    q = request.GET.get("q", "").strip()
+    if q and search_type == SEARCH_TYPES.OPINION:
+        try:
+            citations = eyecite.get_citations(q)
+            usc_cites = [c for c in citations if isinstance(c, FullLawCitation) and c.corrected_reporter() == "U.S.C."]
+            if usc_cites:
+                cite = usc_cites[0]
+                title = cite.groups.get("title")
+                section = cite.groups.get("section")
+                api_base = getattr(settings, "USCODE_API_URL", "http://127.0.0.1:8000")
+
+                # Fetch statute details and HTML segment from U.S. Code Link Service
+                r = requests.get(f"{api_base}/link/uscode/{title}/{section}?link-type=content", timeout=2.0)
+                if r.status_code == 200:
+                    data = r.json()
+                    render_dict["uscode_card"] = {
+                        "title": title,
+                        "section": section,
+                        "heading": data.get("heading"),
+                        "year": data.get("year"),
+                        "html": data.get("html"),
+                    }
+        except Exception:
+            pass  # Fail silently if API is down or import fails
+
     render_dict.update(
         {"alert_form": alert_form, "alerts_context": alerts_context}
     )

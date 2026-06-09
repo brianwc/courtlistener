@@ -7,6 +7,27 @@
         <h2 class="opinion-section-title jump-link" id="case-details">Table of Authorities</h2>
         <hr class="hr-opinion">
         <div id="authorities">
+            {% if statutory_authorities %}
+                <h3 class="v-offset-above-2 v-offset-below-2">Statutory Authorities (U.S. Code)</h3>
+                <div class="list-group v-offset-below-3">
+                    {% for statute in statutory_authorities %}
+                        <div class="list-group-item" style="border: none; padding-left: 0; padding-bottom: 15px; background: transparent;">
+                            <h4 class="bottom serif" style="margin: 0;">
+                                <span class="citation us-code-citation" data-title="{{ statute.title }}" data-section="{{ statute.section }}">
+                                    <a href="https://api.courtlistener.com/uscode/link/uscode/{{ statute.title }}/{{ statute.section }}?link-type=html" target="_blank" rel="noopener">
+                                        {{ statute.citation_string }}
+                                    </a>
+                                </span>
+                            </h4>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                {% if authorities_with_data %}
+                    <h3 class="v-offset-above-3 v-offset-below-2">Case Law Authorities</h3>
+                {% endif %}
+            {% endif %}
+
             {% for authority in authorities_with_data %}
                 <article>
                     <h3 class="bottom serif">

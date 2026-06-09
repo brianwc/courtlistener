@@ -42,7 +42,7 @@
                             <a href="{% url 'admin:search_opinioncluster_change' cluster.pk %}"
                                class="btn btn-primary btn-xs">Cluster
                               {% if track_events %}
-                              (<span id="event_count"><i class="fa fa-spinner fa-spin"></i></span> views)
+                               (<span id="event_count"><i class="fa fa-spinner fa-spin"></i></span> views)
                               {% endif %}
                             </a>
                         {% endif %}
@@ -261,7 +261,7 @@
                             <li><strong>Panel:</strong>
                                 {% for p in cluster.panel.all %}
                                     <a href="{{ p.get_absolute_url }}">{{ p.name_full }}</a>{% if not forloop.last %}, {% endif %}
-                                {% endfor %}
+                                Endfor %}
                             </li>
                         {% endif %}
 
@@ -313,6 +313,21 @@
         {% include "includes/opinion_tabs_content.html" %}
         {% include "includes/notes_modal.html" %}
 
+        <!-- Dismissible U.S. Code Statute Overlay Panel -->
+        <div id="uscode-sidebar-overlay" class="uscode-overlay-panel hidden-print">
+            <div class="uscode-overlay-header">
+                <h4 id="uscode-overlay-title">U.S. Code Reference</h4>
+                <button type="button" id="uscode-overlay-close" aria-label="Close panel">&times;</button>
+            </div>
+            <div class="uscode-overlay-body" id="uscode-overlay-body">
+                <div class="uscode-spinner-container" id="uscode-overlay-loader">
+                    <i class="fa fa-spinner fa-spin fa-2x"></i>
+                    <p>Fetching statute text...</p>
+                </div>
+                <div id="uscode-overlay-content" class="uscode-statute-content"></div>
+            </div>
+        </div>
+
     </div>
 {% endblock %}
 
@@ -336,4 +351,3 @@
     <script src="{% static "js/htmx.min.js" %}"></script>
   {% endif %}
 {% endblock %}
-

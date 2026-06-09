@@ -1,7 +1,7 @@
 
-////////////////
+// ////////////////
 // Pagination //
-////////////////
+// ////////////////
 
 // Star pagination weirdness for ANON 2020 dataset -
 
@@ -72,9 +72,9 @@ document.querySelectorAll('strong').forEach((el) => {
   }
 });
 
-///////////////
+// ///////////////
 // Footnotes //
-///////////////
+// ///////////////
 
 
 
@@ -288,4 +288,64 @@ document.querySelectorAll("page-label").forEach(label => {
             window.location.href = href;
         }
     });
+});
+
+// /////////////////////////////
+// U.S. Code Overlay Handler //
+// /////////////////////////////
+
+$(document).ready(function () {
+  const $panel = $('#uscode-sidebar-overlay');
+  const $title = $('#uscode-overlay-title');
+  const $loader = $('#uscode-overlay-loader');
+  const $content = $('#uscode-overlay-content');
+
+  // Handle click on U.S. Code links
+  $(document).on('click', '.us-code-citation a', function (e) {
+    e.preventDefault();
+    const $container = $(this).closest('.us-code-citation');
+    const title = $container.data('title');
+    const section = $container.data('section');
+
+    // Display overlay sidebar and loading state
+    $title.text(`U.S.C. Title ${title} § ${section}`);
+    $content.hide().empty();
+    $loader.show();
+    $panel.addClass('open');
+
+    // Fetch statute text from the Link Service API
+    const apiBaseUrl = 'http://127.0.0.1:8000'; // Fallback to localhost during development
+    const fetchUrl = `${apiBaseUrl}/link/uscode/${title}/${section}?link-type=content`;
+
+    $.ajax({
+      url: fetchUrl,
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        $loader.hide();
+        if (data.html) {
+          $title.text(`${data.title} U.S.C. § ${data.section} - ${data.heading || ''}`);
+          $content.html(data.html).show();
+        } else {
+          $content.html('<p class="text-danger">Failed to load content.</p>').show();
+        }
+      },
+      error: function () {
+        $loader.hide();
+        $content.html('<p class="text-danger">Could not reach the U.S. Code service. Please try again later.</p>').show();
+      }
+    });
+  });
+
+  // Handle panel close button click
+  $('#uscode-overlay-close').on('click', function () {
+    $panel.removeClass('open');
+  });
+
+  // Close panel if clicked outside
+  $(document).on('mouseup', function (e) {
+    if (!$panel.is(e.target) && $panel.has(e.target).length === 0 && !$(e.target).closest('.us-code-citation').length) {
+      $panel.removeClass('open');
+    }
+  });
 });
